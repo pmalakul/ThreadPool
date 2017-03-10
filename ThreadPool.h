@@ -44,6 +44,9 @@ namespace PMConcurrency {
 		}
 
 		void start() {
+			if(_io_service.stopped()) {
+				_io_service.reset();
+			}
 			_work.reset(new asio::io_service::work(_io_service));
 			_io_service.run();
 		}
@@ -52,6 +55,7 @@ namespace PMConcurrency {
 			if(_work) {
 				_work.reset();
 			}
+
 		}
 
 	private:
@@ -95,6 +99,9 @@ namespace PMConcurrency {
 		}
 
 		void start() {
+			if(_io_service.stopped()) {
+				_io_service.reset();
+			}
 			_work.reset(new asio::io_service::work(_io_service));
 			for ( std::size_t i = 0; i < _thread_size; ++i ) {
 				_group.emplace_back( [this] () {
@@ -121,9 +128,7 @@ namespace PMConcurrency {
 					thread.join();
 				}
 			}
-			if(_io_service.stopped()) {
-				_io_service.reset();
-			}
+
 			_group.clear();
 		}
 
