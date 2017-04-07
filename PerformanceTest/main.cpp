@@ -45,8 +45,10 @@ void getpi(size_t total_count) {
 
     int num_threads = std::thread::hardware_concurrency() - 1;
 
-    std::vector<std::thread> threads(num_threads);
-    std::vector<int> in_count(num_threads);
+    std::vector<std::thread> threads;
+    threads.reserve(num_threads);
+
+    std::vector<int> in_count;
     in_count.resize(num_threads);
 
     for (size_t i = 0; i < num_threads; ++i) {
@@ -115,9 +117,12 @@ void getfibonacci() {
 
     int num_threads = std::thread::hardware_concurrency() - 1;
 
-    std::vector<std::thread> threads(num_threads);
-    std::vector<unsigned long long> results(a.size());
+    std::vector<std::thread> threads;
+    threads.reserve(num_threads);
+
+    std::vector<unsigned long long> results;
     results.resize(a.size());
+
     size_t index = 0;
     for (size_t i = 0; i < num_threads && index < a.size() ; ++i) {
         size_t total_iterations = a.size() / num_threads;
@@ -158,7 +163,6 @@ void getfibonacci_serial() {
     std::vector<int> a = { 41, 42, 43, 44, 45, 46, 47, 48 };
 
     std::vector<unsigned long long> results(a.size());
-    results.resize(a.size());
     for (size_t i = 0; i < a.size() ; ++i) {
         results[i] = fibonacci(a[i]);
         // std::cout << i << ":" << index << ":" << total_iterations << std::endl;
@@ -183,7 +187,7 @@ void getpi_ppl(size_t total_count, size_t num_tasks = std::thread::hardware_conc
     // size_t num_threads = std::thread::hardware_concurrency() - 1;
     // size_t num_threads = 1000;
 
-    std::vector<int> in_count(num_tasks);
+    std::vector<int> in_count;
     in_count.resize(num_tasks);
 
     concurrency::parallel_for( (size_t) 0, num_tasks, [total_count, num_tasks, &in_count] (size_t i) {
@@ -212,7 +216,8 @@ void getfibonacci_ppl() {
     // An array of Fibonacci numbers to compute.
     std::vector<int> a = { 41, 42, 43, 44, 45, 46, 47, 48};
 
-    concurrency::concurrent_vector<unsigned long long> results(a.size());
+    // concurrency::concurrent_vector<unsigned long long> results;
+    std::vector<unsigned long long> results;
     results.resize(a.size());
 
     concurrency::parallel_for( (size_t) 0, a.size(), [&] (size_t i) {
@@ -237,22 +242,22 @@ int main() {
     // getpi_ppl(1000000000);
     
     // getfibonacci_serial();
-    getfibonacci();
+    // getfibonacci();
     // getfibonacci_ppl();
     
-    // std::function<void (std::string const &)> func = 
-    //   [] (std::string const & result) {
-    //     std::cout << result << std::endl;
-    // };
+    std::function<void (std::string const &)> func = 
+      [] (std::string const & result) {
+        std::cout << result << std::endl;
+    };
 
-    // PMConcurrency::ThreadPool threadPool;
+    PMConcurrency::ThreadPool threadPool;
 
     // std::shared_ptr<TP::getpi> myGetPi = std::make_shared<TP::getpi>(threadPool, threadPool.get_thread_size(), func);
     // myGetPi->start();
 
-    // std::shared_ptr<TP::getfib> myGetFib = std::make_shared<TP::getfib>(threadPool, threadPool.get_thread_size(), func);
-    // myGetFib->start();
+    std::shared_ptr<TP::getfib> myGetFib = std::make_shared<TP::getfib>(threadPool, threadPool.get_thread_size(), func);
+    myGetFib->start();
 
-    // threadPool.startMainIoService();
+    threadPool.startMainIoService();
     return 0;
 }

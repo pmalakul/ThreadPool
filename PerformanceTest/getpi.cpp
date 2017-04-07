@@ -213,9 +213,10 @@ void getpi::runNativePi(size_t total_count) {
 
     int num_threads = std::thread::hardware_concurrency() - 1;
 
-    std::vector<std::thread> threads(num_threads);
+    std::vector<std::thread> threads;
+    threads.reserve(num_threads);
+
     std::vector<int> in_count(num_threads);
-    in_count.resize(num_threads);
 
     for (size_t i = 0; i < num_threads; ++i) {
         size_t total_iterations = total_count / num_threads;
